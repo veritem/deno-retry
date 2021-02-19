@@ -1,2 +1,3 @@
 # deno-retry
-Custom strategies for failed operations 
+
+Custom strategies for failed operations
