@@ -2,7 +2,7 @@
 
 interface RetryOptions {
   forver?: boolean;
-  unref?: boolean
+  unref?: boolean;
 }
 
 export class RetryOperation {
@@ -17,7 +17,7 @@ export class RetryOperation {
   private timeout: number;
   private operationStart: number;
   private timer: number;
-  private cachedTimeouts: any;
+  private cachedTimeouts: unknown;
 
   constructor(timeOuts: string[], options: unknown) {
     this.originalTimeouts = JSON.parse(JSON.stringify(timeOuts));
@@ -61,46 +61,44 @@ export class RetryOperation {
       return false;
     }
 
-
-
-    if(err && (new Date().getTime() - this.operationStart) >= this.maxRetryTime){
-        this.errors.push(err)
-        this.errors.unshift(new Error('RetryOperation timeout operation').message)
-        return false
+    if (
+      err && (new Date().getTime() - this.operationStart) >= this.maxRetryTime
+    ) {
+      this.errors.push(err);
+      this.errors.unshift(
+        new Error("RetryOperation timeout operation").message,
+      );
+      return false;
     }
 
+    this.errors.push(err);
 
-    this.errors.push(err)
+    // let timeout = "jsjsj"
 
+    // if (timeout === undefined) {
+    //   if (this.cachedTimeouts) {
+    //     this.errors.splice(0, this.errors.length - 1);
+    //     // timeout = this.cachedTimeouts.slice(-1);
+    //   } else {
+    //     return false;
+    //   }
+    // }
 
-    let timeout = this.timeouts.unshift()
+    this.timer = setTimeout(() => {
+      this.attempts++;
+      if (this.operationTimeout) {
+        this.timeout = setTimeout(() => {
+          this.operationTimeoutCb(this.attempts);
+        }, this.operationTimeout);
+      }
+    });
 
-    if(timeout === undefined){
-        if(this.cachedTimeouts){
-            this.errors.splice(0,this.errors.length - 1)
-            timeout = this.cachedTimeouts.slice(-1)
-        }else{
-            return false
-        }
+    if (this.options.unref) {
+      // this.timeouts.unref()
     }
-
-    this.timer = setTimeout(()=>{
-        this.attempts++
-        if(this.operationTimeout){
-            this.timeout = setTimeout(() => {
-             this.operationTimeoutCb(this.attempts)
-            },this.operationTimeout);
-        }
-    })
-
-    if(this.options.unref){
-        // this.timeouts.unref()
-    }
-
 
     return false;
   }
 
-  operationTimeoutCb(attempts:number){}
-
+  operationTimeoutCb(attempts: number) {}
 }
