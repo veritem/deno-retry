@@ -12,20 +12,19 @@ jobs:
 
     strategy:
       matrix:
-        deno: ["v1.x", "nightly"]
+        deno: ["v1.7.4"]
         os: [macOS-latest, windows-latest, ubuntu-latest]
 
     steps:
-      - name: Setup repo
+      - name: Git Checkout Deno Module
         uses: actions/checkout@v2
-
-      - name: Setup Deno
-        uses: denolib/setup-deno@c7d7968ad4a59c159a777f79adddad6872ee8d96
+      - name: Use Deno Version ${{ matrix.deno-version }}
+        uses: denolib/setup-deno@v2
         with:
-          deno-version: ${{ matrix.deno }} # tests across multiple Deno versions
-
-      - name: Cache Dependencies
-        run: deno cache deps.ts
-
-      - name: Run Tests
-        run: deno test
+          deno-version: ${{ matrix.deno-version }}
+      - name: Lint Deno Module
+        run: deno fmt --check
+      - name: Build Deno Module
+        run: deno run --reload mod.ts
+      - name: Test Deno Module
+        run: deno test --allow-none
